@@ -27,12 +27,12 @@ function onFormSubmit(e) {
         return;
     }
 
-    // toggleLoader(true);
+    toggleLoader(true);
 
     getImg(query)
         .then(data => {
             renderImg(data);
-            // toggleLoader(false);
+            toggleLoader(false);
 
             if (data.hits.length === 0) {
                 iziToast.error({
@@ -44,13 +44,17 @@ function onFormSubmit(e) {
         })
         .catch(error => {
             console.error('Error fetching images:', error);
-            // toggleLoader(false);
+            toggleLoader(false);
+            clearGallery();
             iziToast.error({
                 position: "topRight",
                 message: 'Failed to fetch images. Please try again later.',
             });
         });
         
+}
+function clearGallery() {
+    refs.imgEl.innerHTML = '';
 }
 
 function getImg(query) {
@@ -85,6 +89,7 @@ function imgTemplate(photo) {
                 alt="${photo.tags}"
                 class="photo"
             />
+            
             <div class="photo-body">
                 <p class="photo-name">Likes ${photo.likes}</p>
                 <p class="photo-name">Views ${photo.views}</p>
@@ -97,11 +102,16 @@ function imgTemplate(photo) {
 
 function renderImg(data) {
     refs.imgEl.innerHTML = data.hits.map(img => imgTemplate(img)).join('');
-    const lightbox = new SimpleLightbox('[data-lightbox="photos"]');
-    
+
+    const lightbox = new SimpleLightbox('[data-lightbox="photos"]', {
+        captionDelay: 250,
+        captionsData: 'alt',
+    });
     lightbox.refresh();
 }
 
-// function toggleLoader(isVisible) {
-//     refs.loaderEl.style.display = isVisible ? 'inline-block' : 'none';
-// }
+
+
+function toggleLoader(isVisible) {
+    refs.loaderEl.style.display = isVisible ? 'inline-block' : 'none';
+}
